@@ -13,18 +13,13 @@ RUN apt-get install -y --force-yes build-essential curl git
 RUN apt-get install -y --force-yes zlib1g-dev libssl-dev libreadline-dev libyaml-dev libxml2 libxml2-dev libxslt-dev libcurl4-openssl-dev
 RUN apt-get clean
 
-# Install rbenv
-RUN git clone https://github.com/sstephenson/rbenv.git ~/.rbenv
-ENV PATH ~/.rbenv/bin:$PATH
-RUN echo 'eval "$(rbenv init -)"' >> /etc/profile.d/rbenv.sh
-RUN chmod +x /etc/profile.d/rbenv.sh
-
-# Install ruby-build
-RUN git clone https://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
+# Add Brightbox ruby mirror
+RUN apt-get install -y python-software-properties
+RUN apt-add-repository ppa:brightbox/ruby-ng
+RUN apt-get update
 
 # Install Ruby 2.1.0
-RUN bash -l -c 'rbenv install 2.1.0'
-RUN bash -l -c 'rbenv global 2.1.0'
+RUN apt-get install -y ruby2.1 ruby2.1-dev
 
 # Install MongoDB
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
