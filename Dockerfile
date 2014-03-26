@@ -33,12 +33,18 @@ RUN mkdir /mongodb/log
 RUN bash -l -c 'gem install bundler'
 
 # Install Errbit
-RUN git clone https://github.com/errbit/errbit.git ~/errbit
-RUN bash -l -c 'cd ~/errbit; bundle install'
-#RUN bash -l -c 'mongod --dbpath /mongodb/data --logpath /mongodb/log/mongo.log &'; bash -l -c 'cd ~/errbit; rake errbit:bootstrap';
+RUN git clone https://github.com/errbit/errbit.git /errbit
+RUN bash -l -c 'cd /errbit; bundle install'
 
-# Launch rails server
-# ENTRYPOINT bash -l -c 'cd ~/errbit; script/rails server'
+# Bootstrap Errbit (needs running mongodb)
+RUN bash -l -c 'mongod --dbpath /mongodb/data --logpath /mongodb/log/mongo.log &'; bash -l -c 'cd /errbit; rake errbit:bootstrap';
+
+# Install and configure supervisord (process control)
+RUN apt-get install -y supervisor
+RUN mkdir -p /var/log/supervisor
+ADD ./supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Expose rails server port
 EXPOSE 3000
+
+CMD ["supervisord", "-n"]
