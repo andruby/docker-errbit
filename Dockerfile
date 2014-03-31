@@ -44,7 +44,12 @@ RUN apt-get install -y supervisor
 RUN mkdir -p /var/log/supervisor
 ADD ./supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
+# Install sshd and set roots password
+RUN apt-get install -y openssh-server
+RUN mkdir /var/run/sshd
+RUN echo 'root:toor' |chpasswd
+
 # Expose rails server port
-EXPOSE 3000
+EXPOSE 3000 22
 
 CMD ["supervisord", "-n"]
